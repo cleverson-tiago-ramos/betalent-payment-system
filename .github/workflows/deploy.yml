@@ -1,9 +1,9 @@
-name: CI/CD RETTA App
+name: CI/CD BeTalent App
 
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   build-and-deploy:
@@ -13,33 +13,33 @@ jobs:
       - name: 🔄 Clonar repositório
         uses: actions/checkout@v3
 
-      - name: 🐳 Subir containers com Docker Compose (CI)
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+      - name: 🐳 Subir containers com Docker Compose
+        run: docker compose up -d --build
 
       - name: ⏱️ Aguardar containers subirem
-        run: sleep 10
+        run: sleep 15
 
-      - name: 📜 Verificar logs iniciais do Laravel
-        run: docker compose logs jobs_retta
+      - name: 📜 Verificar logs iniciais
+        run: docker compose logs app
 
       - name: 📦 Instalar dependências Laravel
         run: |
-          docker compose exec --workdir /var/www jobs_retta composer install --no-interaction --prefer-dist
+          docker compose exec app composer install --no-interaction --prefer-dist
 
       - name: 📝 Copiar .env padrão
-        run: docker compose exec --workdir /var/www jobs_retta cp .env.example .env
+        run: docker compose exec app cp .env.example .env || echo ".env já existe"
 
       - name: 🔐 Gerar APP_KEY
-        run: docker compose exec --workdir /var/www jobs_retta php artisan key:generate
+        run: docker compose exec app php artisan key:generate
 
       - name: 🗄️ Rodar migrations
-        run: docker compose exec --workdir /var/www jobs_retta php artisan migrate --force
+        run: docker compose exec app php artisan migrate --force
 
       - name: ✅ Verificar containers em execução
         run: docker compose ps
 
       - name: 🧪 Executar testes Laravel
-        run: docker compose exec --workdir /var/www jobs_retta php artisan test
+        run: docker compose exec app php artisan test
 
       - name: 🚀 Finalizar deploy
         run: echo "✅ Deploy concluído com sucesso!"
