@@ -34,6 +34,7 @@ services:
       - "8000:80"
     volumes:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./backend:/var/www/html
     depends_on:
       - app
     networks:
@@ -46,6 +47,8 @@ services:
     container_name: betalent-frontend
     ports:
       - "3000:3000"
+    environment:
+      - HOST=0.0.0.0 # ⬅️ Adicione esta linha
     networks:
       - betalent-network
 
